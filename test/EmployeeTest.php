@@ -170,53 +170,27 @@ class EmployeeTest extends TestCase {
             but there is no walkaround, since this test depends on the current date.
             "Eighteen years ago" cannot be hardcoded.
         */
-        // American date format needed for the calculations
-        $sEighteenYearsAgo = date('Y-m-d', strtotime('18 years ago'));
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('-1 days'));
-        $sEighteenYearsAgoMinusOneDay = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
-        
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('1 days'));
-        $sEighteenYearsAgoPlusOneDay = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
-        
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('-10 days'));
-        $sEighteenYearsAgoMinusTenDays = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
-        
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('10 days'));
-        $sEighteenYearsAgoPlusTenDays = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
+        $today = new DateTimeImmutable();
+        $format = 'd/m/Y';
 
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('-8 years'));
-        $sEighteenYearsAgoMinusEightYears = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
+        // Base date: 18 years ago from today
+        $eighteenYearsAgo = $today->modify('-18 years');
 
-        $dEighteenYearsAgo = date_create($sEighteenYearsAgo);
-        date_add($dEighteenYearsAgo, date_interval_create_from_date_string('8 years'));
-        $sEighteenYearsAgoPlusEightYears = date_format($dEighteenYearsAgo, Employee::DATE_FORMAT);
-
-        // Danish date format needed for the Employee class
-        $sEighteenYearsAgo = date(Employee::DATE_FORMAT, strtotime('18 years ago'));
-        
-        // AMR: The method was not working at all due to date format issues.
-        //      I discovered it thanks to this unit test
         return [
-            [$sEighteenYearsAgo, true],
-            [$sEighteenYearsAgoMinusOneDay, true],
-            [$sEighteenYearsAgoMinusTenDays, true],
-            [$sEighteenYearsAgoMinusEightYears, true],
-            [$sEighteenYearsAgoPlusOneDay, false],
-            [$sEighteenYearsAgoPlusTenDays, false],
-            [$sEighteenYearsAgoPlusEightYears, false],
+            [$eighteenYearsAgo->format($format), true],
+            [$eighteenYearsAgo->modify('+1 day')->format($format), false],
+            [$eighteenYearsAgo->modify('-1 day')->format($format), true],
+            [$eighteenYearsAgo->modify('-10 days')->format($format), true],
+            [$eighteenYearsAgo->modify('+10 days')->format($format), false],
+            [$eighteenYearsAgo->modify('-8 years')->format($format), true],
+            [$eighteenYearsAgo->modify('+8 years')->format($format), false],
             ['', false],
             ['31/02/1970', false],
             ['1970-01-31', false],
             [999, false],
             [true, false],
         ];
-    }
+    }        
 
     #[DataProvider('provideDateOfEmployment')]
     public function testDateOfEmployment($value, $expected): void 
@@ -227,44 +201,17 @@ class EmployeeTest extends TestCase {
     }
     public static function provideDateOfEmployment(): array
     {
-        // American date format needed for the calculations
-        $sToday = date('Y-m-d');
-        $dToday = date_create($sToday);
-        
-        date_add($dToday, date_interval_create_from_date_string('-1 days'));
-        $sYesterday = date_format($dToday, Employee::DATE_FORMAT);
-        
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('1 days'));
-        $sTomorrow = date_format($dToday, Employee::DATE_FORMAT);
-        
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('-10 days'));
-        $sTodayMinusTenDays = date_format($dToday, Employee::DATE_FORMAT);
-        
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('10 days'));
-        $sTodayPlusTenDays = date_format($dToday, Employee::DATE_FORMAT);
+        $today = new DateTimeImmutable();
+        $format = 'd/m/Y';
 
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('-8 years'));
-        $sTodayMinusEightYears = date_format($dToday, Employee::DATE_FORMAT);
-
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('8 years'));
-        $sTodayPlusEightYears = date_format($dToday, Employee::DATE_FORMAT);
-
-        // Danish date format needed for the Employee class
-        $sToday = date(Employee::DATE_FORMAT, strtotime('18 years ago'));
-        
         return [
-            [$sToday, true],
-            [$sYesterday, true],
-            [$sTodayMinusTenDays, true],
-            [$sTodayMinusEightYears, true],
-            [$sTomorrow, false],
-            [$sTodayPlusTenDays, false],
-            [$sTodayPlusEightYears, false],
+            [$today->format($format), true],
+            [$today->modify('-1 day')->format($format), true],
+            [$today->modify('-10 days')->format($format), true],
+            [$today->modify('-8 years')->format($format), true],
+            [$today->modify('+1 day')->format($format), false],
+            [$today->modify('+10 days')->format($format), false],
+            [$today->modify('+8 years')->format($format), false],
             ['', false],
             ['31/02/1970', false],
             ['1970-01-31', false],
@@ -304,34 +251,15 @@ class EmployeeTest extends TestCase {
     }
     public static function provideDiscount(): array 
     {
-        // American date format needed for the calculations
-        $sToday = date('Y-m-d');
-        $dToday = date_create($sToday);
-        
-        date_add($dToday, date_interval_create_from_date_string('-1 years'));
-        $sTodayMinusOneYear = date_format($dToday, Employee::DATE_FORMAT);
-        
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('-10 years'));
-        $sTodayMinusTenYears = date_format($dToday, Employee::DATE_FORMAT);
-        
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('-15 years'));
-        $sTodayMinusFifteenYears = date_format($dToday, Employee::DATE_FORMAT);
+        $today = new DateTimeImmutable();
+        $format = 'd/m/Y';
 
-        $dToday = date_create($sToday);
-        date_add($dToday, date_interval_create_from_date_string('-23 years'));
-        $sTodayMinusTwentyThreeYears = date_format($dToday, Employee::DATE_FORMAT);
-
-        // Danish date format needed for the Employee class
-        $sToday = date('Y-m-d');
-        
         return [
-            [$sToday, 0],
-            [$sTodayMinusOneYear, 0.5],
-            [$sTodayMinusTenYears, 5],
-            [$sTodayMinusFifteenYears, 7.5],
-            [$sTodayMinusTwentyThreeYears, 11.5],
+            [$today->format($format), 0.0],
+            [$today->modify('-1 year')->format($format), 0.5],
+            [$today->modify('-10 years')->format($format), 5.0],
+            [$today->modify('-15 years')->format($format), 7.5],
+            [$today->modify('-23 years')->format($format), 11.5],
         ];
     }
 
