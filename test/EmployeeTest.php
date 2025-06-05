@@ -9,6 +9,7 @@
 require_once 'classes/employee.php';
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class EmployeeTest extends TestCase {
     private Employee $employee;
@@ -36,23 +37,25 @@ class EmployeeTest extends TestCase {
         ['abcdef,', false],                   
     ];
 
-    public function setUp(): void {
+    public function setUp(): void 
+    {
         $this->employee = new Employee;
     }
 
-    public function tearDown(): void {
+    public function tearDown(): void 
+    {
         unset($this->employee);
     }
 
-    /**
-     * @dataProvider provideCPR
-     */
-    public function testCpr($value, $expected): void {
+    #[DataProvider('provideCPR')]
+    public function testCpr($value, $expected): void 
+    {
         $res = $this->employee->setCpr($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideCpr() {
+    public static function provideCpr(): array 
+    {
         return [
             ['1234567890', true],   // Valid upper and lower boundary
             ['0000000000', true],
@@ -72,27 +75,27 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideFirstName
-     */
-    public function testFirstName($value, $expected): void {
+    #[DataProvider('provideFirstName')]
+    public function testFirstName($value, $expected): void 
+    {
         $res = $this->employee->setFirstName($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideFirstName() {
+    public static function provideFirstName(): array 
+    {
         return self::STRING_30_CHARS;
     }
 
-    /**
-     * @dataProvider provideDepartment
-     */
-    public function testDepartment($value, $expected): void {
+    #[DataProvider('provideDepartment')]
+    public function testDepartment($value, $expected): void 
+    {
         $res = $this->employee->setDepartment($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideDepartment() {
+    public static function provideDepartment(): array 
+    {
         return [
             ['HR', true],
             ['Finance', true],
@@ -105,15 +108,15 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideBaseSalary
-     */
-    public function testBaseSalary($value, $expected): void {
+    #[DataProvider('provideBaseSalary')]
+    public function testBaseSalary($value, $expected): void 
+    {
         $res = $this->employee->setBaseSalary($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideBaseSalary() {
+    public static function provideBaseSalary(): array 
+    {
         return [
             [20000, true],          // Valid lower boundary
             [20000.01, true],       // Valid lower boundary + 1 (3-value approach)
@@ -131,15 +134,15 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideEducationalLevel
-     */
-    public function testEducationalLevel($value, $expected): void {
+    #[DataProvider('provideEducationalLevel')]
+    public function testEducationalLevel($value, $expected): void 
+    {
         $res = $this->employee->setEducationalLevel($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideEducationalLevel() {
+    public static function provideEducationalLevel(): array
+    {
         return [
             [0, true],          
             [1, true],          
@@ -152,15 +155,15 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideDateOfBirth
-     */
-    public function testDateOfBirth($value, $expected): void {
+    #[DataProvider('provideDateOfBirth')]
+    public function testDateOfBirth($value, $expected): void 
+    {
         $res = $this->employee->setDateOfBirth($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideDateOfBirth() {
+    public static function provideDateOfBirth(): array
+    {
         /* 
             PROBLEM
             Business calculations should never be part of a unit test,
@@ -215,15 +218,15 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideDateOfEmployment
-     */
-    public function testDateOfEmployment($value, $expected): void {
+    #[DataProvider('provideDateOfEmployment')]
+    public function testDateOfEmployment($value, $expected): void 
+    {
         $res = $this->employee->setDateOfEmployment($value);
 
         $this->assertEquals($expected, $res);
     }
-    public function provideDateOfEmployment() {
+    public static function provideDateOfEmployment(): array
+    {
         // American date format needed for the calculations
         $sToday = date('Y-m-d');
         $dToday = date_create($sToday);
@@ -270,17 +273,17 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideSalary
-     */
-    public function testSalary($value, $expected): void {
+    #[DataProvider('provideSalary')]
+    public function testSalary($value, $expected): void 
+    {
         $this->employee->setBaseSalary($value[0]);
         $this->employee->setEducationalLevel($value[1]);
         $res = $this->employee->getSalary();
 
         $this->assertEquals($expected, $res);
     }
-    public function provideSalary() {
+    public static function provideSalary(): array 
+    {
         return [
             [[30000, 0], 30000],          
             [[30000, 1], 31220],          
@@ -291,16 +294,16 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideDiscount
-     */
-    public function testDiscount($value, $expected): void {
+    #[DataProvider('provideDiscount')]
+    public function testDiscount($value, $expected): void 
+    {
         $this->employee->setDateOfEmployment($value);
         $res = $this->employee->getDiscount();
 
         $this->assertEquals($expected, $res);
     }
-    public function provideDiscount() {
+    public static function provideDiscount(): array 
+    {
         // American date format needed for the calculations
         $sToday = date('Y-m-d');
         $dToday = date_create($sToday);
@@ -332,16 +335,16 @@ class EmployeeTest extends TestCase {
         ];
     }
 
-    /**
-     * @dataProvider provideShippingCosts
-     */
-    public function testShippingCosts($value, $expected): void {
+    #[DataProvider('provideShippingCosts')]
+    public function testShippingCosts($value, $expected): void 
+    {
         $this->employee->setCountry($value);
         $res = $this->employee->getShippingCosts();
 
         $this->assertEquals($expected, $res);
     }
-    public function provideShippingCosts() {
+    public static function provideShippingCosts(): array 
+    {
         return [
             ['Denmark', 0],          
             ['Norway', 0],          
